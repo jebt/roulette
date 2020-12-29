@@ -2,8 +2,6 @@ let startStake = 10;
 let startMoney = 5000;
 let target = 10000
 
-
-
 let randomCounts = [];
 let randomBlack = [];
 let total = 2;
@@ -34,138 +32,33 @@ let history =[]
 let textHeight = 350
 
 function setup() {
+  frameRate(1);
   createCanvas(innerWidth, innerHeight);
   for (let i = 0; i < total; i++) {
     randomCounts[i] = 0;
   }
-  
-  // //Startgeld
-  // input2 = createInput();
-  // input2.position(85, 205);
-  // input2.size(50, 16);
-  // input2.value(money);
-  // button2 = createButton('Start €');
-  // button2.position(input2.x + input2.width, 205);
-  // button2.mousePressed(herZien);
-  
-  // //Doel
-  // input3 = createInput();
-  // input3.position(85, 225);
-  // input3.size(50, 16);
-  // input3.value(target);
-  // button3 = createButton('Doel €');
-  // button3.position(input3.x + input3.width, 225);
-  // button3.mousePressed(herZien);
 }
-
-
-// function herZien() {
-//   var Startgeld = input2.value();
-//   console.log("Startgeld",Startgeld);
-//   var Doel = input3.value();
-//   console.log("Doel",Doel);
-//   if(startMoney){
-//     startMoney = Number(Startgeld)
-//   }
-//   totalaccount = 0 - startMoney
-//   money = startMoney
-//   if(doel){
-//     target = Number(doel)
-//   }
-  
-//   input3.value(target);
-//   input2.value(startMoney);
-// setup()
-// }
 
 function draw() {
   noStroke();
-  background(10,100,10,100);
-  frameRate(8)
-  turns++
-  let index = floor(random(total));
-  randomCounts[index]++;
+  background(37);
+  turns++;
 
-  console.log(randomCounts);
+  spinLogic();
+  setGameOver();
+  visualizeStreaks();
+  visualizeHistory();
+  visualizeGraph();
+  walkerColor();
+  showText();
+  showUnderlines();
+}
 
-  if (index == 0) {
-    // Black wins
-    blackWins++
-    blackArray.push(1)
-    history.push(0)
-    averageBlackArray.push(blackArray.length);
-    redArray.length = 0;
-
-    // inzet eraf
-    money = money - stake;
-    stake = stake * 2;
-
-    //langste streak bijhouden
-    if (maxWinsBlack < blackWins) {
-      maxWinsBlack = blackWins;
-    }
-    // maxstreak visualisatie data updaten?
-    if (maxBlackArray.length < blackArray.length) {
-      maxBlackArray.length = blackArray.length
-    }
-    //Wat is de hoogst geregistreerde inzet
-    if (maxstake < stake) {
-      maxstake = stake;
-    }
-
-    fill(0)
-    ellipse(270, textHeight+30,20,20)
-    // ellipse(200, textHeight-70,20,20)
-
-  } else {
-    //ELSE --> RedWins    
-    redWins++
-    blackArray.length = 0;
-    redArray.push(1);
-    history.push(1);
-    averageRedArray.push(redArray.length);
-    //inzet erbij
-    money = money + stake;
-    stake = startStake;
-    //langste streak bijhouden
-    if (maxWinsRed < redWins) {
-      maxWinsRed = redWins;
-    }
-    // maxstreak visualisatie data updaten?
-    if (maxRedArray.length < redArray.length) {
-      maxRedArray.length = redArray.length
-    }
-    fill(255,0,0)
-    ellipse(270, textHeight+30,20,20)
-    // ellipse(200, textHeight-70,20,20)
-  }
-
-  //Set gameOver
-  if (money < 0 || stake > money) {
-    endpointsX.push(x)
-    endpointsY.push(y)
-    totalaccount = totalaccount + money
-    totalaccount = totalaccount - startMoney
-    gameOverMinus++
-    averageTurns.push(turns) 
-    turns = 0;
-    stake = startStake;
-    money = startMoney;
-    redWins = 0;
-    blackWins = 0;
-  }
-  if (money > target) {
-    totalaccount = totalaccount + money
-    totalaccount = totalaccount - startMoney
-    gameOverPlus++
-    averageTurns.push(turns) 
-    turns = 0;
-    stake = startStake;
-    money = startMoney;
-    redWins = 0;
-    blackWins = 0;
-  }
-
+function getAvg(grades) {
+  const total = grades.reduce((acc, c) => acc + c, 0);
+  return (total / grades.length);
+}
+function visualizeStreaks() {
   //reeksRood visualiseren  
   fill(255, 0, 0);
   for (let j = 0; j < redArray.length; j++) {
@@ -189,28 +82,8 @@ function draw() {
     rect(600 + (15 * j), textHeight + 65, 10, 10)
   }
   fill(255);
-
-  history.reverse()
- for (let i = 1; i < 20; i++) {
-  switch(history[i]) {
-    case 0:
-      fill(0)
-      ellipse(290 + (15 *i), textHeight +30 , 10, 10 ) 
-      // code block
-      break;
-    case 1:
-      fill(255,0,0)
-      ellipse(290 + (15 *i), textHeight +30 , 10, 10 ) 
-      // code block
-      break;
-    default:
-      // code block
-  }
-
-
- }
-
-  
+}
+function visualizeGraph(){
   //GRAFIEK VAN GELD
   let oldTurns = 0;
   if(turns > 250){
@@ -259,8 +132,35 @@ function draw() {
       fill(255,0,0)    
     }
   }
-  
-  
+}
+function setGameOver(){
+  //Set gameOver
+  if (money < 0 || stake > money) {
+    endpointsX.push(x)
+    endpointsY.push(y)
+    totalaccount = totalaccount + money
+    totalaccount = totalaccount - startMoney
+    gameOverMinus++
+    averageTurns.push(turns) 
+    turns = 0;
+    stake = startStake;
+    money = startMoney;
+    redWins = 0;
+    blackWins = 0;
+  }
+  if (money > target) {
+    totalaccount = totalaccount + money
+    totalaccount = totalaccount - startMoney
+    gameOverPlus++
+    averageTurns.push(turns) 
+    turns = 0;
+    stake = startStake;
+    money = startMoney;
+    redWins = 0;
+    blackWins = 0;
+  }
+}
+function walkerColor(){
   //walker kleur
   noStroke()
   if(money < startMoney) {
@@ -273,8 +173,8 @@ function draw() {
     fill(0,255,0,125);
     ellipse(x, y, 10, 10);
   }
-  
-
+}
+function showText(){
   //Status geld
   fill(220)
   noStroke()
@@ -295,8 +195,7 @@ function draw() {
   text("Doel €" +target, 135, textHeight)
   
   text("Laatste 19", 300, textHeight)
-
-    
+ 
   textSize(24)
   //sessiecijfers rood
   text("Rood streak # " + redArray.length, 75, textHeight+100);
@@ -320,18 +219,84 @@ function draw() {
 
   //titels
   // fill(0)
-  textSize(28)
+  textSize(20)
   text("Alle Sessies samen", 75, textHeight + 230)
   text("Speel tot een winst van "+ target+ ", tot de 0 of totdat de inzet zo hoog is dat je startbudget niet dekt", 75, textHeight-300)
-  
+}
+function showUnderlines(){
   //underlines
   stroke(255)
   line(75,585, width -75, textHeight+235);
   line(75,textHeight-295, width -75, textHeight-295);
 }
+function spinLogic(){
+  let index = floor(random(total));
+  randomCounts[index]++;
+  if (index == 0) {
+    // Black wins
+    blackWins++;
+    blackArray.push(1)
+    history.push(0)
+    averageBlackArray.push(blackArray.length);
+    redArray.length = 0;
 
+    // inzet eraf
+    money = money - stake;
+    stake = stake * 2;
 
-function getAvg(grades) {
-  const total = grades.reduce((acc, c) => acc + c, 0);
-  return Math.round(total / grades.length);
+    //langste streak bijhouden
+    if (maxWinsBlack < blackWins) {
+      maxWinsBlack = blackWins;
+    }
+    // maxstreak visualisatie data updaten?
+    if (maxBlackArray.length < blackArray.length) {
+      maxBlackArray.length = blackArray.length;
+    }
+    //Wat is de hoogst geregistreerde inzet
+    if (maxstake < stake) {
+      maxstake = stake;
+    }
+    fill(0)
+    ellipse(270, textHeight+30,20,20)
+  } else {
+    //ELSE --> RedWins    
+    redWins++
+    blackArray.length = 0;
+    redArray.push(1);
+    history.push(1);
+    averageRedArray.push(redArray.length);
+    //inzet erbij
+    money = money + stake;
+    stake = startStake;
+    //langste streak bijhouden
+    if (maxWinsRed < redWins) {
+      maxWinsRed = redWins;
+    }
+    // maxstreak visualisatie data updaten?
+    if (maxRedArray.length < redArray.length) {
+      maxRedArray.length = redArray.length
+    }
+    fill(255,0,0)
+    ellipse(270, textHeight+30,20,20)
+  }
+}
+function visualizeHistory(){
+  history.reverse();
+  for (let i = 1; i < 20; i++) {
+    switch(history[i]) {
+      case 0:
+        fill(0)
+        ellipse(290 + (15 *i), textHeight +30 , 10, 10 ) 
+        // code block
+        break;
+      case 1:
+        fill(255,0,0)
+        ellipse(290 + (15 *i), textHeight +30 , 10, 10 ) 
+        // code block
+        break;
+      default:
+        // code block
+    }
+ }
+  history.reverse();
 }
